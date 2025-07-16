@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: auto;
+            animation: gradientBG 12s ease infinite;
+            color: #fff;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            animation: slideFadeIn 0.5s ease forwards;
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        @keyframes slideFadeIn {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        a.button {
+            display: inline-block;
+            margin: 10px 10px 20px;
+            padding: 10px 20px;
+            justify-content: center;
+            align-items: center;
+            background: black;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.2s;
+        }
+
+        a.button:hover {
+            background-color:rgb(38, 38, 39);
+            transform: scale(1.1);
+        }
+
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .post {
+            background-color: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            animation: fadeInPost 0.6s ease forwards;
+        }
+
+        @keyframes fadeInPost {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .post img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+        }
+
+        .post a {
+            margin: 10px;
+            display: inline-block;
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .post a:hover {
+            transform:  scale(1.03);
+            
+        }
+    </style>
+</head>
+<body>
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h2>Welcome to Blog-Builder,<br> {{ username }}</h2>
+    <p>
+        <a href="/add" class="button">Add New Post</a>
+        <a href="/logout" class="button">Logout</a>
+    </p>
+    <hr>
+
+    <div class="posts-grid">
+        {% for post in posts %}
+    <div class="post">
+        <a href="/post/{{ post.id }}">
+            <h3>{{ post.title }}</h3>
+        </a>
+
+        {% if post.image %}
+            <a href="/post/{{ post.id }}">
+                <img src="{{ url_for('static', filename='uploads/' ~ post.image) }}" alt="Post Image">
+            </a>
+        {% endif %}
+
+        <p><strong>Created:</strong> {{ post.created_at }}</p>
+
+        <p>
+            <a href="/edit/{{ post.id }}">Edit</a>
+            <a href="/delete/{{ post.id }}" onclick="return confirm('Delete this post?')">Delete</a>
+        </p>
+    </div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}
+</body>
+</html>

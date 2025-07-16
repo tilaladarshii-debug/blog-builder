@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ post[0] }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: auto;
+            animation: gradientBG 12s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 0 20px;
+    background: white;
+    border-radius: 5px;
+    box-sizing: border-box;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+}
+
+        h2, p, small {
+            animation: fadeIn 1s ease forwards;
+        }
+
+        .img{
+            width: 30%;
+            height: 30%%;
+            object-fit: cover;
+        }
+
+        .comment-box {
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .comment {
+            border-bottom: 1px solid #ccc;
+            padding: 8px 0;
+            opacity: 0;
+            animation: fadeIn 0.6s ease forwards;
+            animation-delay: 0.3s;
+        }
+
+        .comment:nth-child(2) { animation-delay: 0.4s; }
+        .comment:nth-child(3) { animation-delay: 0.5s; }
+        .comment:nth-child(4) { animation-delay: 0.6s; }
+
+        .comment small {
+            display: block;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        textarea {
+            width: 70%;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        form textarea:focus {
+            box-shadow: 0 0 5px rgba(46, 47, 47, 0.6);
+            outline: none;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 9px 15px;
+            background: black;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color:rgb(38, 38, 38);
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h2>{{ post[2] }}</h2>
+    {% if post[6] %}
+    <img src="{{ url_for('static', filename='uploads/' ~ post[6]) }}" class="img">
+    {% endif %}
+    {% if can_like %}
+    <form method="POST" action="/post/{{ post_id }}/like">
+        <button type="submit" style="background: none; border: none; cursor: pointer; font-size: 20px; color: black;">
+            {% if is_liked %}
+                <i class="fas fa-heart" style="color: red;"></i>
+            {% else %}
+                <i class="far fa-heart" style="color: black;"></i>
+            {% endif %}
+            {{ like_count }}
+        </button>
+        </form>
+    {% else %}
+    {% if user_id %}
+        <div style="font-size: 20px; color: gray;">
+            <i class="fas fa-heart" style="color: red;"></i> {{ like_count }}
+            <span style="font-size: 14px;">(You can't like your own post)</span>
+        </div>
+    {% elif not is_logged_in %}
+    <a href="{{ url_for('login') }}" style="text-decoration: none;">
+        <div style="background: none; border: none; cursor: pointer; font-size: 20px; color: gray;">
+            <i class="far fa-heart" style="color: black;"></i> {{ like_count }}
+        </div>
+    </a>
+    {% endif %}
+
+    {% endif %}
+
+    <pre>{{ post[3] | e }}</pre>
+
+    <small>Posted on {{ post[4].strftime('%b %d, %Y at %I:%M %p') }} - By {{ post[11] }}</small>
+
+        <div class="comment-box">
+        <form method="POST" action="/post/{{ post_id }}/comment">
+        <h3>All comments</h3>
+        {% for comment in comments %}
+            " {{ comment.text }} " - <small>By {{ comment.username }} on {{ comment.created_at.strftime('%b %d, %Y') }}</small><br>
+        {% endfor %}
+            <textarea name="comment" placeholder="Add your comment..." required></textarea><br>
+            <button type="submit">Post Comment</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+</body>
+</html>

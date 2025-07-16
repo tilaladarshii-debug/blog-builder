@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Post</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', sans-serif;
+            background-size: 400% 400%;
+            background: auto;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+        }
+
+        form {
+            background: white;
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 10px 20px rgb(75, 75, 75);
+            animation: slideFadeIn 1s ease forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        @keyframes slideFadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        form input[type="text"],
+        form textarea,
+        form input[type="file"],
+        form select,
+        form input[type="datetime-local"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            box-shadow: 0 0 8px rgba(58, 58, 58, 0.6);
+            outline: none;
+        }
+
+        button {
+            display: block;
+            margin: 20px auto;
+            width: 30%;
+            background: rgb(4, 4, 4);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(37, 37, 37, 0.5);
+        }
+
+        #mediaPreview img,
+        #mediaPreview video {
+            align-items: center;
+            justify-content: center;
+            max-width: 50%;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: rgb(31, 32, 32);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<form method="POST" enctype="multipart/form-data">
+    <h2>Add New Post</h2>
+    <input type="text" name="title" placeholder="Post Title" required>
+    <textarea name="content" placeholder="Write your post..." rows="6" required></textarea>
+    <input type="file" name="image[]" accept="image/*,video/*" multiple>
+    <div id="mediaPreview"></div>
+
+    <select name="status" id="status" onchange="toggleScheduleField()" required>
+        <option value="publish">Publish Now</option>
+        <option value="draft">Save as Draft</option>
+        <option value="scheduled">Schedule for Later</option>
+    </select>
+
+    <input type="datetime-local" name="schedule_time" id="schedule_time" style="display:none;">
+    <button type="submit">Submit</button>
+    <a href="/dashboard">Back to Dashboard</a>
+</form>
+
+<script>
+    document.querySelector('input[type="file"]').addEventListener('change', function (event) {
+        const preview = document.getElementById('mediaPreview');
+        preview.innerHTML = '';
+
+        Array.from(event.target.files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                let element;
+                if (file.type.startsWith('image/')) {
+                    element = document.createElement('img');
+                    element.src = e.target.result;
+                } else if (file.type.startsWith('video/')) {
+                    element = document.createElement('video');
+                    element.src = e.target.result;
+                    element.controls = true;
+                }
+                if (element) preview.appendChild(element);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+
+    function toggleScheduleField() {
+        const status = document.getElementById('status').value;
+        const scheduleField = document.getElementById('schedule_time');
+        scheduleField.style.display = (status === 'scheduled') ? 'block' : 'none';
+    }
+
+    window.onload = toggleScheduleField;
+</script>
+
+</body>
+</html>

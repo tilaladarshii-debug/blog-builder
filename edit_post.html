@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Post</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .container {
+    width: 100%;
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+        form {
+            background: white;
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 10px 20px rgb(75, 75, 75);
+            animation: slideFadeIn 1s ease forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        @keyframes slideFadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        form input[type="text"],
+        form textarea,
+        form input[type="file"]{
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            box-shadow: 0 0 8px rgba(58, 58, 58, 0.6);
+            outline: none;
+        }
+
+        button {
+            display: block;
+            margin: 20px auto;
+            width: 30%;
+            background: rgb(4, 4, 4);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(37, 37, 37, 0.5);
+        }
+
+        #mediaPreview img,
+        #mediaPreview video {
+            max-width: 350px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: rgb(31, 32, 32);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+<form method="POST" enctype="multipart/form-data">
+    <h2>Edit Post</h2>
+        <input type="text" name="title" value="{{ post[0] }}" required>
+        <textarea name="content" rows="6" required>{{ post[1] }}</textarea>
+
+        {% if post[2] %}
+    <label>Current Image:</label><br>
+    <img src="{{ url_for('static', filename='uploads/' ~ post[2]) }}" style="max-width: 350px; border-radius: 5px; margin-bottom: 10px;"><br>
+{% endif %}
+
+        <input type="file" name="image[]" accept="image/*,video/*" multiple>New Image:
+        <div id="mediaPreview"></div>
+        
+        <button type="submit">Update Post</button>
+    <a href="/dashboard">Back to Dashboard</a>
+</form>
+</div>
+{% endblock %}
+<script>
+    document.querySelector('input[type="file"]').addEventListener('change', function (event) {
+        const preview = document.getElementById('mediaPreview');
+        preview.innerHTML = '';
+
+        Array.from(event.target.files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                let element;
+                if (file.type.startsWith('image/')) {
+                    element = document.createElement('img');
+                    element.src = e.target.result;
+                } else if (file.type.startsWith('video/')) {
+                    element = document.createElement('video');
+                    element.src = e.target.result;
+                    element.controls = true;
+                }
+                if (element) preview.appendChild(element);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+</script>
+</body>
+</html>
